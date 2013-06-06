@@ -1,0 +1,5 @@
+%echo Generating a basic OpenPGP key
+<% @conf.each do |key,value| %>
+<%= key %>: <%= value %>
+<% end %>
+%commit
