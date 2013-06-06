@@ -57,9 +57,9 @@ In order to protect package signing with a pass-phrase add the following attribu
 
 The `reprepro` command will the prompt for the password when is signs a package.
 
-# Usage
-
 This will create a new repository in `node.debian.repo.path`. A new GPG key (without pass-phrase) will be generated and its public subkey written to the file `gpg.key` inside the repository. 
+
+# Usage
 
 Add new packages to the repository using `reprepro`, for example:
 
