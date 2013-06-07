@@ -16,7 +16,7 @@ The "debian" cookbook deploys Debian package mirrors and local package repositor
 
 The "debian" cookbook has no default recipe. Include one of the following recipes to the run-list:
 
-* _mirror_ – Deploy a Debian package mirror. (NOT YET IMPLEMENTED) 
+* _mirror_ – Deploy a Debian package mirror. [Details...](documents/mirror.markdown) (In DEVELOPMENT) 
 * _cacher_ – Deploy a Debian package caching proxy. [Details...](documents/cacher.markdown)
 * _repo_ – Deploy a local package repository. [Details...](documents/repo.markdown)
 
