@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# Architecture (i386, powerpc, amd64, etc.)
+arch=<%= @conf[:arch].join(',') %>
+
+# Section (main,contrib,non-free)
+section=<%= @conf[:section].join(',') %>
+
+# Release of the system (squeeze,lenny,stable,testing,etc)
+release=<%= @conf[:release].join(',') %>
+
+# Server name, minus the protocol and the path at the end
+server=<%= @conf[:server] %>
+
+# Path from the main server, so http://my.web.server/$dir, Server dependant
+path=<%= @conf[:path] %>
+
+# Protocol to use for transfer (http, ftp, hftp, rsync)
+proto=<%= @conf[:proto] %>
+
+# Directory to store the mirror in
+storage=<%= @conf[:storage] %>
+
+# Start script
+
+debmirror       -a $arch \
+                --no-source \
+                --md5sums \
+                --progress \
+                --passive \
+                --verbose \
+                -s $section \
+                -h $server \
+                -d $release \
+                -r $path \
+                -e $proto \
+                $storage

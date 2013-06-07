@@ -16,3 +16,46 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+package 'debian-archive-keyring'
+
+keyring = "#{ENV['HOME']}/.gnupg/trustedkeys.gpg"
+execute "Debian package archive keys added to #{keyring}" do
+  command "gpg --no-default-keyring --keyring trustedkeys.gpg --import /usr/share/keyrings/debian-archive-keyring.gpg"
+  not_if do ::File.exists? keyring end
+end
+   
+puts ::File.exists? keyring
+
+package 'debmirror'
+
+directory '/etc/mirror.d'
+
+node.debian.mirrors.each do |path,conf|
+
+  storage = "#{node.debian.mirror.path}/#{path}"
+
+  directory storage do
+    recursive true
+  end
+ 
+  unless conf.has_key? :release
+    log("No release defined to mirror in: " + storage ) { level :fatal }
+  end
+
+  conf[:arch] = ['amd64'] unless conf.has_key? :arch
+  conf[:section] = ['main'] unless conf.has_key? :section
+  conf[:server] = 'ftp.us.debian.org' unless conf.has_key? :server
+  conf[:proto] = 'http' unless conf.has_key? :proto
+  conf[:path] = '/debian' unless conf.has_key? :path
+  conf[:storage] = storage
+
+  name = path.gsub(/\//,'_')
+
+  template "/etc/mirror.d/#{name}.sh" do
+    source 'etc_mirror.d_generic.sh.erb'
+    mode "0700"
+    variables( :conf => conf )
+  end
+
+end
