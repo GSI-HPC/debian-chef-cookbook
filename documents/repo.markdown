@@ -41,6 +41,7 @@ The minimum configuration describes your project/organization details:
       }
     }
 
+This will create a new repository in `node.debian.repo.path`. A new GPG key (without pass-phrase) will be generated and its public subkey written to the file `gpg.key` inside the repository. 
 
 In order to protect package signing with a pass-phrase add the following attributes to the configuration:
 
@@ -55,9 +56,7 @@ In order to protect package signing with a pass-phrase add the following attribu
       }
     }
 
-The `reprepro` command will the prompt for the password when is signs a package.
-
-This will create a new repository in `node.debian.repo.path`. A new GPG key (without pass-phrase) will be generated and its public subkey written to the file `gpg.key` inside the repository. 
+The `reprepro` command will prompt for the password when is signs a package.
 
 # Usage
 
