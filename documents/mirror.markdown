@@ -1,5 +1,5 @@
 
-The `debian::mirror` recipe installs and configures Debian package archive mirrors using `debmirror`. It will install Apache to server the local mirror.
+The _debian::mirror_ recipe installs and configures Debian package archive mirrors using `debmirror`. It will install Apache to server the local mirror.
 
 ↪ `attributes/mirror.rb`  
 ↪ `recipes/mirror.rb`  
@@ -7,25 +7,24 @@ The `debian::mirror` recipe installs and configures Debian package archive mirro
 
 ## Configuration
 
-Add the recipe `debian::mirror` to the run-list and configure the source Debian package archive servers to be mirrored. 
+Add the recipe _debian::mirror_ to the run-list and configure the source Debian package archive servers to be mirrored. 
 
 **Attributes**
 
-Attributes `node.debian.mirror`:
+Attributes _node.debian.mirror_:
 
-* `path` (default `/srv/mirror`) – Base path to store all package mirrors.
-* `notify` (optional) – Mirror cronjob notification mail address.
+* _path_ (default `/srv/mirror`) – Base path to store all package mirrors.
+* _user_ (default mirror) – User executing the mirror scripts.
+* _notify_ (optional) – Mirror cronjob notification mail address.
 
-Attributes in `node.debian.mirrors` are keys defining the relative path to store a particular package archive mirror: Their values contain the configuration for `debmirror`. The recipe will generate executable scripts in `/etc/mirror.d/` containing the configuration for each mirror (details in the `debmirror` manual):
+Attributes in _node.debian.mirrors_ are keys defining the relative path to store a particular package archive mirror: Their values contain the configuration for `debmirror`. The recipe will generate executable scripts in `/etc/mirror.d/` containing the configuration for each mirror (details in the `debmirror` manual):
 
-* `release` (required) – Release of the system (squeeze,lenny,stable,testing,etc)
-* `arch` (default amd64) – Architecture (i386, powerpc, amd64, etc.)
-* `section` (default main) – Section (main,contrib,non-free).
-* `server` (default ftp.us.debian.org) – Server name of the node publishing the original archive.
-* `path` (default `/debian`) – Path on the archive server.
-* `proto` (default http) – Protocol to use for transfer (http, ftp, http, rsync)
-
-Debian archive signature keys in the package `debain-archive-keyring` are used by default and added to the `~/.gnupg/trustedkeys.gpg` keyring used by `debmirror`. You need to add additional keys for archives not present in this package if needed!
+* _release_ (required) – Release of the system (squeeze,lenny,stable,testing,etc)
+* _arch_ (default amd64) – Architecture (i386, powerpc, amd64, etc.)
+* _section_ (default main) – Section (main,contrib,non-free).
+* _server_ (default ftp.us.debian.org) – Server name of the node publishing the original archive.
+* _path_ (default `/debian`) – Path on the archive server.
+* _proto_ (default http) – Protocol to use for transfer (http, ftp, http, rsync)
 
 **Examples**
 
@@ -53,9 +52,14 @@ This will generate the script `/etc/mirror.d/wheezy.sh` to store the mirror in `
 
 ## Usage
 
-Following the example above, and assuming the mirror node is called `repo.devops.test` place the following lines in `/etc/apt/sources.list` on the clients:
+GPG signatures from the package _debian-archive-keyring_ are used by default, and added to `~/.gnupg/trustedkeys.gpg` of the _node.debian.mirror.user_. List all the keys with:
+
+    » gpg --list-keys --keyring ~/.gnupg/trustedkeys.gpg
+
+Remember to add keys for non Debian repositories to be mirrored!
+
+Following the example above, and assuming the mirror node is called _repo.devops.test_ adjust the following lines in `/etc/apt/sources.list` on the clients:
 
     deb http://repo.devops.test/debian/ wheezy main
     deb-src http://repo.devops.test/debian/ wheezy main
-
 

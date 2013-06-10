@@ -22,10 +22,24 @@ package 'debian-archive-keyring'
 package 'debmirror'
 package 'debianutils'
 
-keyring = "#{ENV['HOME']}/.gnupg/trustedkeys.gpg"
+# User account running the mirror scripts
+user node.debian.mirror.user do
+  home node.debian.mirror.path
+  supports :manage_home => true
+  system true
+end
+
+# GPG keyring used by the mirror scripts
+keyring = "#{node.debian.mirror.path}/.gnupg/trustedkeys.gpg"
+# Export upstream Debian keys
 execute "Debian package archive keys added to #{keyring}" do
-  command "gpg --no-default-keyring --keyring trustedkeys.gpg --import /usr/share/keyrings/debian-archive-keyring.gpg"
-  not_if do ::File.exists? keyring end
+  creates keyring 
+  command <<-EOF
+    su #{node.debian.mirror.user} \
+    --command "gpg --no-default-keyring \
+                   --keyring #{keyring} \
+                   --import /usr/share/keyrings/debian-archive-keyring.gpg"
+  EOF
 end
 
 # Holds the script to sync with package archives
@@ -35,6 +49,7 @@ node.debian.mirrors.each do |path,conf|
   # Make sure the archive directory exists
   storage = "#{node.debian.mirror.path}/#{path}"
   directory storage do
+    owner node.debian.mirror.user
     recursive true
   end
   # Exit if no Debian release code name was defined
@@ -53,7 +68,7 @@ node.debian.mirrors.each do |path,conf|
   # Generate the mirror script
   template "/etc/mirror.d/#{name}.sh" do
     source 'etc_mirror.d_generic.sh.erb'
-    mode "0700"
+    mode '0755'
     variables( :conf => conf )
   end
 end
@@ -70,13 +85,14 @@ template '/etc/apache2/conf.d/mirror.conf' do
 end
 
 cron 'debian_mirror_update' do
+  user node.debian.mirror.user
   minute '0'
   hour '2'
   day '*'
-  mailto node.debian.mirror.notify unless node.debian.mirror.notify.empty?
-  home '/srv/mirror'
-  command <<-EOF
-    run-parts --regex=.sh$ /etc/mirror.d/
-  EOF
+  unless node.debian.mirror.notify.empty?
+    mailto node.debian.mirror.notify 
+  end
+  home node.debian.mirror.path
+  command "run-parts --regex=.sh$ /etc/mirror.d/"
 end
 
