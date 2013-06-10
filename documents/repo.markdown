@@ -1,5 +1,5 @@
 
-The `debian::repo` recipe installs and configures a local Debian package repositories using [reprepro][01].
+The _debian::repo_ recipe installs and configures a local Debian package repositories using [reprepro][01].
 
 ↪ `attributes/repo.rb`  
 ↪ `recipe/repo.rb`  
@@ -11,16 +11,16 @@ The `debian::repo` recipe installs and configures a local Debian package reposit
 
 # Configuration
 
-Including the `debian::repo` recipe to the run-list will lead to the installation of Apache to server the [reprepro][01] maintained package repository.
+Including the _debian::repo_ recipe to the run-list will lead to the installation of Apache to server the [reprepro][01] maintained package repository.
 
 **Attributes**
 
-All attributes in `node.debian.repo`:
+All attributes in _node.debian.repo_:
 
-* `path` (default `/srv/repo`) – Path to the package repository.
-* `distrib` (required) – Configuration file for the repository in `conf/distribution` (see `reprepro` manual).
-* `key` (required) – Configuration for the GPG repository signing (see `gpg` manual).
-* `options` (optional) – Options for `reprepro` (see manual).
+* _path_ (default `/srv/repo`) – Path to the package repository.
+* _distrib_ (required) – Configuration file for the repository in `conf/distribution` (see `reprepro` manual).
+* _key_ (required) – Configuration for the GPG repository signing (see `gpg` manual).
+* _options_ (optional) – Options for `reprepro` (see manual).
 
 **Examples**
 
@@ -41,7 +41,7 @@ The minimum configuration describes your project/organization details:
       }
     }
 
-This will create a new repository in `node.debian.repo.path`. A new GPG key (without pass-phrase) will be generated and its public subkey written to the file `gpg.key` inside the repository. 
+This will create a new repository in _node.debian.repo.path_. A new GPG key (without pass-phrase) will be generated and its public subkey written to the file `gpg.key` inside the repository. 
 
 In order to protect package signing with a pass-phrase add the following attributes to the configuration:
 
@@ -66,7 +66,7 @@ Add new packages to the repository using `reprepro`, for example:
     » reprepro -b /srv/repo list wheezy
     [...SNIP...]
 
-Clients can connect to the repository doing something like (example host name is `repo.devops.test`):
+Clients can connect to the repository doing something like (example host name is _repo.devops.test_):
 
     » wget -O - http://repo.devops.test/debian/gpg.key | apt-key add -
     » echo "deb http://repo.devops.test/debian wheezy main" > /etc/apt/sources.list.d/devops.list

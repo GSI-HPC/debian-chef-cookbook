@@ -3,6 +3,8 @@ The _debian::mirror_ recipe installs and configures Debian package archive mirro
 
 ↪ `attributes/mirror.rb`  
 ↪ `recipes/mirror.rb`  
+↪ `template/default/etc_mirror.d_generic.sh.erb`  
+↪ `template/default/mirror_apache.conf.erb`  
 ↪ `tests/roles/debian_mirror_test.rb`  
 
 ## Configuration
@@ -48,17 +50,24 @@ Mirror the main repositories of Debian Wheezy and Debian Lenny:
         }
     }
 
-This will generate the script `/etc/mirror.d/wheezy.sh` to store the mirror in `/srv/mirror/wheezy`, and the script `/etc/mirror.d/archive_lenny.sh` string the mirror to /srv/mirror/archive/lenny`.
+This will generate the scripts `wheezy.sh` and `archive_lenny.sh` in the `/etc/mirror.d/` directory.
 
 ## Usage
 
-GPG signatures from the package _debian-archive-keyring_ are used by default, and added to `~/.gnupg/trustedkeys.gpg` of the _node.debian.mirror.user_. List all the keys with:
-
+GPG signatures from the package _debian-archive-keyring_ are used by default, and added to `~/.gnupg/trustedkeys.gpg` of the _node.debian.mirror.user_ account. List all the keys with:
+ 
     » gpg --list-keys --keyring ~/.gnupg/trustedkeys.gpg
 
-Remember to add keys for non Debian repositories to be mirrored!
+Remember to add keys for non Debian repositories to be mirrored! 
 
-Following the example above, and assuming the mirror node is called _repo.devops.test_ adjust the following lines in `/etc/apt/sources.list` on the clients:
+Any script in the `/etc/mirror.d/` directory can be executed individually using the _node.debian.mirror.user_ account. Automatic synchronization of the mirrors is triggered by a cronjob:
+
+    » crontab -l
+    # Chef Name: debian_mirror_update
+    HOME=/srv/mirror
+    0 2 * * * run-parts --regex=.sh$ /etc/mirror.d/
+
+Following the example in the configuration section above, and assuming the mirror node is called _repo.devops.test_ adjust the following lines in `/etc/apt/sources.list` on the clients:
 
     deb http://repo.devops.test/debian/ wheezy main
     deb-src http://repo.devops.test/debian/ wheezy main
