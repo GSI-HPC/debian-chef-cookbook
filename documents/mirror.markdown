@@ -53,4 +53,9 @@ This will generate the script `/etc/mirror.d/wheezy.sh` to store the mirror in `
 
 ## Usage
 
+Following the example above, and assuming the mirror node is called `repo.devops.test` place the following lines in `/etc/apt/sources.list` on the clients:
+
+    deb http://repo.devops.test/debian/ wheezy main
+    deb-src http://repo.devops.test/debian/ wheezy main
+
 
