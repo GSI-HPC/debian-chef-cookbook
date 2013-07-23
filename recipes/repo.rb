@@ -39,7 +39,7 @@ end
 template '/etc/apache2/conf.d/repo.conf' do
   source 'repo_apache.conf.erb'
   variables( :path => node.debian.repo.path )
-  notifies :reload, "service[apache2]", :delayed 
+  notifies :reload, "service[apache2]", :delayed
 end
 
 # Install support or GPG package signing
@@ -73,7 +73,7 @@ execute "Create repository GPG key" do
   not_if "gpg --list-keys #{mail}"
 end
 
-# Extract the subkey and write it to the repository 
+# Extract the subkey and write it to the repository
 execute "Export GPG subkey to repository" do
   command <<-EOF
     id=$(gpg --list-keys #{mail} | grep sub | sed 's|/| |g' | awk '{print $3}')
