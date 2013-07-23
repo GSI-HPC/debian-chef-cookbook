@@ -52,13 +52,13 @@ key_conf ="#{node.debian.repo.path}/key.conf"
 # Public subkey for repository
 repo_key = "#{node.debian.repo.path}/gpg.key"
 # Mail address of key owner
-mail = node.debian.repo.key['Name-Email']
+mail = node.debian.repo['key']['Name-Email']
 
 # Write the configuration file for the GPG key creation
 template key_conf do
   source 'repo_key.conf.erb'
   mode '0600'
-  variables( :conf => node.debian.repo.key )
+  variables( :conf => node.debian.repo['key'] )
   # unless a subkey for the repository had been created already
   not_if do ::File.exists? repo_key end
 end
