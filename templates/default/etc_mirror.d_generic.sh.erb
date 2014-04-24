@@ -24,11 +24,6 @@ storage=<%= @conf[:storage] %>
 # Start script
 
 debmirror       -a $arch \
-                --no-source \
-                --md5sums \
-                --progress \
-                --passive \
-                --verbose \
                 -s $section \
                 -h $server \
                 -d $release \

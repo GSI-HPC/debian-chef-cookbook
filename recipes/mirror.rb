@@ -56,20 +56,22 @@ node.debian.mirrors.each do |path,conf|
   unless conf.has_key? :release
     log("No release defined to mirror in: " + storage ) { level :fatal }
   end
-  # Some defaults 
-  conf[:arch] = ['amd64'] unless conf.has_key? :arch
-  conf[:section] = ['main'] unless conf.has_key? :section
-  conf[:server] = 'ftp.us.debian.org' unless conf.has_key? :server
-  conf[:proto] = 'http' unless conf.has_key? :proto
-  conf[:path] = '/debian' unless conf.has_key? :path
-  conf[:storage] = storage
+
+  params = Mash.new.merge(conf)
+  # Some defaults
+  params[:arch] = ['amd64'] unless conf.has_key? :arch
+  params[:section] = ['main'] unless conf.has_key? :section
+  params[:server] = 'ftp.us.debian.org' unless conf.has_key? :server
+  params[:proto] = 'http' unless conf.has_key? :proto
+  params[:path] = '/debian' unless conf.has_key? :path
+  params[:storage] = storage
   # Name of the mirror script.
   name = path.gsub(/\//,'_')
   # Generate the mirror script
   template "/etc/mirror.d/#{name}.sh" do
     source 'etc_mirror.d_generic.sh.erb'
     mode '0755'
-    variables( :conf => conf )
+    variables( :conf => params )
   end
 end
 
