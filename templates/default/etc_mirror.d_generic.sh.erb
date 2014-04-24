@@ -34,4 +34,6 @@ debmirror       -a $arch \
                 -d $release \
                 -r $path \
                 -e $proto \
-                $storage
+<% @conf[:options].each do |option| %>
+                <%= option %> \
+<% end %>                $storage
