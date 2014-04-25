@@ -4,7 +4,7 @@
 #
 # This file is managed by the Chef `debian::mirror` recipe.
 
-Alias /debian <%= @path %>
+Alias <%= @route %> <%= @path %>
 <Directory <%= @path %>>
         Options +Indexes
         AllowOverride None

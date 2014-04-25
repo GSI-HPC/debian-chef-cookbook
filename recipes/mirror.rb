@@ -82,7 +82,8 @@ end
 # Generate the Apache configuration
 template '/etc/apache2/conf.d/mirror.conf' do
   source 'mirror_apache.conf.erb'
-  variables( :path => node.debian.mirror.path )
+  variables( :path => node.debian.mirror.path,
+             :route => node.debian.mirror.route )
   notifies :reload, "service[apache2]", :delayed
 end
 
