@@ -75,16 +75,18 @@ node.debian.mirrors.each do |path,conf|
   end
 end
 
-# Apache is used to server the mirror repsoitories
-service 'apache2' do
-  supports :reload => true
-end
-# Generate the Apache configuration
-template '/etc/apache2/conf.d/mirror.conf' do
-  source 'mirror_apache.conf.erb'
-  variables( :path => node.debian.mirror.path,
-             :route => node.debian.mirror.route )
-  notifies :reload, "service[apache2]", :delayed
+unless node.debian.mirror.skip_apache_config
+  # Apache is used to server the mirror repsoitories
+  service 'apache2' do
+    supports :reload => true
+  end
+  # Generate the Apache configuration
+  template '/etc/apache2/conf.d/mirror.conf' do
+    source 'mirror_apache.conf.erb'
+    variables( :path => node.debian.mirror.path,
+               :route => node.debian.mirror.route )
+    notifies :reload, "service[apache2]", :delayed
+  end
 end
 
 cron 'debian_mirror_update' do
