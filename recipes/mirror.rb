@@ -91,9 +91,9 @@ end
 
 cron 'debian_mirror_update' do
   user node.debian.mirror.user
-  minute '0'
-  hour '2'
-  day '*'
+  minute node.debian.mirror.update_minute
+  hour node.debian.mirror.update_hour
+  day node.debian.mirror.update_day
   unless node.debian.mirror.notify.empty?
     mailto node.debian.mirror.notify 
   end
