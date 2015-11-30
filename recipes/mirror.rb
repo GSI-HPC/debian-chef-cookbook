@@ -95,9 +95,9 @@ cron 'debian_mirror_update' do
   hour node.debian.mirror.update_hour
   day node.debian.mirror.update_day
   unless node.debian.mirror.notify.empty?
-    mailto node.debian.mirror.notify 
+    mailto node.debian.mirror.notify
   end
   home node.debian.mirror.path
-  command "run-parts --regex=.sh$ /etc/mirror.d/"
+  # we cannot prevent this error message:
+  command "run-parts --regex=.sh$ /etc/mirror.d/ 2>&1 | sed -e '/Warning: --rsync-extra is not configured to mirror the trace files\.$/{N;/ *This configuration is not recommended\./d}'"
 end
-
