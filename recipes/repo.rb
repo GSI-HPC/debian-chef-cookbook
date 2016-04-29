@@ -60,7 +60,7 @@ template key_conf do
   mode '0600'
   variables( :conf => node.debian.repo['key'] )
   # unless a subkey for the repository had been created already
-  not_if do ::File.exists? repo_key end
+  not_if do ::File.exist? repo_key end
 end
 
 # Create the repository GPG key and subkey
@@ -79,7 +79,7 @@ execute "Export GPG subkey to repository" do
     id=$(gpg --list-keys #{mail} | grep sub | sed 's|/| |g' | awk '{print $3}')
     gpg --armor --output #{repo_key} --export $id
   EOF
-  not_if do ::File.exists? repo_key end
+  not_if do ::File.exist? repo_key end
 end
 
 # Make sure to remove the GPG configuration file

@@ -1,5 +1,5 @@
-default[:debian][:repo][:path] = '/srv/repo'
-default[:debian][:repo][:distrib] = {
+default['debian']['repo']['path'] = '/srv/repo'
+default['debian']['repo']['distrib'] = {
   'Origin' => 'Your project name',
   'Label' => 'Your project name',
   'Suite' => 'stable',
@@ -9,8 +9,8 @@ default[:debian][:repo][:distrib] = {
   'Components' => 'main',
   'Description' => 'Apt repository for project'
 }
-default[:debian][:repo][:options] = Array.new
-default[:debian][:repo][:key] = {
+default['debian']['repo']['options'] = Array.new
+default['debian']['repo']['key'] = {
   'Key-Type' =>  'RSA',
   'Key-Length' =>  2048,
   'Subkey-Type' => 'ELG-E',

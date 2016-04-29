@@ -33,7 +33,7 @@ end
 keyring = "#{node.debian.mirror.path}/.gnupg/trustedkeys.gpg"
 # Export upstream Debian keys
 execute "Debian package archive keys added to #{keyring}" do
-  creates keyring 
+  creates keyring
   command <<-EOF
     su #{node.debian.mirror.user} \
     --command "gpg --no-default-keyring \
