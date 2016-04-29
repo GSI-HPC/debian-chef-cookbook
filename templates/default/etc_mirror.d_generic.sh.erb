@@ -31,4 +31,5 @@ debmirror       -a $arch \
                 -e $proto \
 <% @conf[:options].each do |option| %>
                 <%= option %> \
-<% end %>                $storage
+<% end -%>
+                $storage $@
