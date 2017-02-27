@@ -23,33 +23,50 @@ package 'debmirror'
 package 'debianutils'
 
 # User account running the mirror scripts
-user node.debian.mirror.user do
-  home node.debian.mirror.path
+user node['debian']['mirror']['user'] do
+  home node['debian']['mirror']['path']
   supports :manage_home => true
   system true
 end
 
 # GPG keyring used by the mirror scripts
-keyring = "#{node.debian.mirror.path}/.gnupg/trustedkeys.gpg"
+keyring = "#{node['debian']['mirror']['path']}/.gnupg/trustedkeys.gpg"
 # Export upstream Debian keys
 execute "Debian package archive keys added to #{keyring}" do
   creates keyring
-  command <<-EOF
-    su #{node.debian.mirror.user} \
-    --command "gpg --no-default-keyring \
-                   --keyring #{keyring} \
-                   --import /usr/share/keyrings/debian-archive-keyring.gpg"
-  EOF
+  user node['debian']['mirror']['user']
+  command "gpg --no-default-keyring --keyring #{keyring} " \
+          "--import /usr/share/keyrings/debian-archive-keyring.gpg"
+end
+
+# TODO: use ruby-gpgme for key management
+#
+# we may want to add additional repos with non-standard keys to be
+#  mirrored but not neccessarily trusted by the local apt setup:
+#
+node['debian']['mirror']['additional_keys'].each do |fingerprint,key|
+  # TODO: inspect gpg key:
+  #`gpg --with-fingerprint --with-colon <<< "#{key}"`
+  execute "Adding repo key #{fingerprint}" do
+    command "gpg --no-default-keyring --keyring #{keyring}" \
+            " --import <<-EOD\n#{key}\nEOD"
+    user node['debian']['mirror']['user']
+    # without $HOME gpg tries to create /root/.gnupg :(
+    environment ({'HOME' => node['debian']['mirror']['path']})
+    not_if "gpg --no-default-keyring --keyring #{keyring} " \
+           "--list-public-keys #{fingerprint}"
+  end
 end
 
 # Holds the script to sync with package archives
 directory '/etc/mirror.d'
+
 # Configure all mirrors defined by attributes
-node.debian.mirrors.each do |path,conf|
+node['debian']['mirrors'].each do |path,conf|
   # Make sure the archive directory exists
-  storage = "#{node.debian.mirror.path}/#{path}"
+  storage = "#{node['debian']['mirror']['path']}/#{path}"
   directory storage do
-    owner node.debian.mirror.user
+    owner node['debian']['mirror']['user']
     recursive true
   end
   # Exit if no Debian release code name was defined
@@ -75,7 +92,7 @@ node.debian.mirrors.each do |path,conf|
   end
 end
 
-unless node.debian.mirror.skip_apache_config
+unless node['debian']['mirror']['skip_apache_config']
   # Apache is used to server the mirror repsoitories
   service 'apache2' do
     supports :reload => true
@@ -83,21 +100,22 @@ unless node.debian.mirror.skip_apache_config
   # Generate the Apache configuration
   template '/etc/apache2/conf.d/mirror.conf' do
     source 'mirror_apache.conf.erb'
-    variables( :path => node.debian.mirror.path,
-               :route => node.debian.mirror.route )
+    variables( :path => node['debian']['mirror']['path'],
+               :route => node['debian']['mirror']['route'] )
     notifies :reload, "service[apache2]", :delayed
   end
 end
 
+# FIXME: create a file in /etc/cron.d instead
 cron 'debian_mirror_update' do
-  user node.debian.mirror.user
-  minute node.debian.mirror.update_minute
-  hour node.debian.mirror.update_hour
-  day node.debian.mirror.update_day
-  unless node.debian.mirror.notify.empty?
-    mailto node.debian.mirror.notify
+  user node['debian']['mirror']['user']
+  minute node['debian']['mirror']['update_minute']
+  hour node['debian']['mirror']['update_hour']
+  day node['debian']['mirror']['update_day']
+  unless node['debian']['mirror']['notify'].empty?
+    mailto node['debian']['mirror']['notify']
   end
-  home node.debian.mirror.path
+  home node['debian']['mirror']['path']
   # we cannot prevent this error message:
   command "run-parts --regex=.sh$ /etc/mirror.d/ 2>&1 | sed -e '/Warning: --rsync-extra is not configured to mirror the trace files\.$/{N;/ *This configuration is not recommended\./d}'"
 end
