@@ -52,7 +52,7 @@ node['debian']['mirror']['additional_keys'].each do |fingerprint,key|
             " --import <<-EOD\n#{key}\nEOD"
     user node['debian']['mirror']['user']
     # without $HOME gpg tries to create /root/.gnupg :(
-    environment ({'HOME' => node['debian']['mirror']['path']})
+    environment( 'HOME' => node['debian']['mirror']['path'] )
     not_if "gpg --no-default-keyring --keyring #{keyring} " \
            "--list-public-keys #{fingerprint}"
   end
