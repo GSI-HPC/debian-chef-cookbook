@@ -23,12 +23,12 @@ storage=<%= @conf[:storage] %>
 
 # Start script
 
-debmirror       -a $arch \
-                -s $section \
-                -h $server \
-                -d $release \
-                -r $path \
-                -e $proto \
+debmirror   --dist $release \
+            --arch $arch \
+         --section $section \
+          --method $proto \
+            --host $server \
+            --root $path \
 <% @conf[:options].each do |option| %>
                 <%= option %> \
 <% end -%>
