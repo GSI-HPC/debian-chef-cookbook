@@ -25,19 +25,20 @@ package 'debianutils'
 # User account running the mirror scripts
 user node['debian']['mirror']['user'] do
   home node['debian']['mirror']['path']
-  supports :manage_home => true
+  manage_home true
   system true
 end
 
 # GPG keyring used by the mirror scripts
 keyring = "#{node['debian']['mirror']['path']}/.gnupg/trustedkeys.gpg"
 # Export upstream Debian keys
-execute "Debian package archive keys added to #{keyring}" do
-  creates keyring
-  user node['debian']['mirror']['user']
-  command "gpg --no-default-keyring --keyring #{keyring} " \
-          "--import /usr/share/keyrings/debian-archive-keyring.gpg"
-end
+# execute "Debian package archive keys added to #{keyring}" do
+#   creates keyring
+#   user node['debian']['mirror']['user']
+#   cwd  node['debian']['mirror']['path']
+#   command "gpg --no-default-keyring --keyring #{keyring} " \
+#           "--import /usr/share/keyrings/debian-archive-keyring.gpg"
+# end
 
 # TODO: use ruby-gpgme for key management
 #
@@ -69,19 +70,17 @@ node['debian']['mirrors'].each do |path,conf|
     owner node['debian']['mirror']['user']
     recursive true
   end
-  # Exit if no Debian release code name was defined
-  unless conf.has_key? :release
-    log("No release defined to mirror in: " + storage ) { level :fatal }
-  end
 
   params = Mash.new.merge(conf)
   # Some defaults
-  params[:arch] = ['amd64'] unless conf.has_key? :arch
-  params[:section] = ['main'] unless conf.has_key? :section
-  params[:server] = 'ftp.us.debian.org' unless conf.has_key? :server
-  params[:proto] = 'http' unless conf.has_key? :proto
-  params[:path] = '/debian' unless conf.has_key? :path
+  params[:release] ||= node['lsb']['codename']
+  params[:arch]    ||= ['amd64']
+  params[:section] ||= %w[main contrib non-free]
+  params[:server]  ||= 'deb.debian.org'
+  params[:proto]   ||= 'http'
+  params[:path]    ||= '/' + path
   params[:storage] = storage
+  params[:options] ||= []
   # Name of the mirror script.
   name = path.gsub(/\//,'_')
   # Generate the mirror script
