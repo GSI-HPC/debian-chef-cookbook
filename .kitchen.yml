@@ -40,3 +40,16 @@ suites:
     run_list:
       - recipe[debian::mirror]
     attributes:
+      debian:
+        mirror:
+          skip_apache_config: true
+        mirrors:
+          debian-security:
+            arch:
+              - amd64
+            release:
+              - jessie/updates
+              - stretch/updates
+            section:
+              - main
+            server: security.debian.org
