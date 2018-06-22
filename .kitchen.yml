@@ -53,3 +53,5 @@ suites:
             section:
               - main
             server: security.debian.org
+            options:
+              - '--keyring /usr/share/keyrings/debian-archive-keyring.gpg'
